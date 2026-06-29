@@ -1,0 +1,6 @@
+data/
+uploads/
+.adminjs/
+*.tsbuildinfo
+*.env
+*.env.local

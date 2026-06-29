@@ -1,0 +1,35 @@
+{
+  "name": "rsnra-auth",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --names=\"AUTH-WEB,AUTH-API\" -c \"cyan,yellow\" \"pnpm --filter @rsnra-auth/web dev\" \"pnpm --filter @rsnra-auth/api dev\"",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "lint": "turbo lint",
+    "update": "node update.js",
+    "setup": "node scripts/setup-env.mjs",
+    "kill": "node scripts/kill-ports.mjs",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@inquirer/prompts": "^8.5.2",
+    "@types/bcryptjs": "^3.0.0",
+    "bcryptjs": "^3.0.3",
+    "concurrently": "^10.0.3",
+    "prettier": "^3.8.3",
+    "prettier-plugin-tailwindcss": "^0.8.0",
+    "turbo": "^2.5.4"
+  },
+  "engines": {
+    "node": ">=22",
+    "pnpm": ">=10"
+  },
+  "packageManager": "pnpm@10.30.3",
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "bcrypt",
+      "better-sqlite3"
+    ]
+  }
+}
