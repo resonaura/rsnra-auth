@@ -111,32 +111,37 @@ export class AuthService implements OnApplicationBootstrap {
   attachSessionCookie(reply: FastifyReply, accessToken: string) {
     const isProduction = config.NODE_ENV === 'production';
     const domain =
-      config.COOKIE_DOMAIN ?? (isProduction ? '.rsnra.com' : undefined);
+      config.COOKIE_DOMAIN ?? (isProduction ? '.rsnra.com' : 'localhost');
+    // In production: SameSite=Lax + Secure (HTTPS) + Domain=.rsnra.com
+    // In dev: SameSite=None + Secure (localhost is secure context in
+    // Chrome/Firefox) + Domain=localhost (shared across ports)
+    const sameSite = isProduction ? 'Lax' : 'None';
     const attributes = [
       `rsnra_session=${accessToken}`,
       'Path=/',
       'HttpOnly',
-      'SameSite=Lax',
+      `SameSite=${sameSite}`,
       'Max-Age=31536000',
-      domain ? `Domain=${domain}` : null,
-      isProduction ? 'Secure' : null,
-    ].filter(Boolean);
+      `Domain=${domain}`,
+      'Secure',
+    ];
     reply.header('Set-Cookie', attributes.join('; '));
   }
 
   clearSessionCookie(reply: FastifyReply) {
     const isProduction = config.NODE_ENV === 'production';
     const domain =
-      config.COOKIE_DOMAIN ?? (isProduction ? '.rsnra.com' : undefined);
+      config.COOKIE_DOMAIN ?? (isProduction ? '.rsnra.com' : 'localhost');
+    const sameSite = isProduction ? 'Lax' : 'None';
     const attributes = [
       'rsnra_session=',
       'Path=/',
       'HttpOnly',
-      'SameSite=Lax',
+      `SameSite=${sameSite}`,
       'Max-Age=0',
-      domain ? `Domain=${domain}` : null,
-      isProduction ? 'Secure' : null,
-    ].filter(Boolean);
+      `Domain=${domain}`,
+      'Secure',
+    ];
     reply.header('Set-Cookie', attributes.join('; '));
   }
 

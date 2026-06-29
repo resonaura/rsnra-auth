@@ -71,7 +71,13 @@ export function AuthPage() {
       } else {
         await register(email, password, displayName || undefined);
       }
-      navigate(redirect);
+      // Use window.location for absolute URLs (cross-origin redirects
+      // to other services), navigate() for internal paths.
+      if (redirect.startsWith('http')) {
+        window.location.href = redirect;
+      } else {
+        navigate(redirect);
+      }
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Something went wrong');
     } finally {
