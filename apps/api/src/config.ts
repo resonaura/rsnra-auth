@@ -1,6 +1,6 @@
-import { z, ZodError } from 'zod';
-import dotenv from 'dotenv';
 import { Logger } from '@nestjs/common';
+import dotenv from 'dotenv';
+import { z, ZodError } from 'zod';
 
 dotenv.config();
 
@@ -40,6 +40,8 @@ export const envSchema = z.object({
   // Public base URL for the auth API (used to construct absolute avatar URLs
   // that work on other services like rsnra-link and resomd).
   AUTH_API_PUBLIC_URL: z.string().default('http://localhost:2998'),
+  // Public base URL for the auth web app (used for WebAuthn origin verification).
+  AUTH_WEB_PUBLIC_URL: z.string().default('http://localhost:2999'),
 
   // OAuth client secrets (first-party clients seeded on first boot)
   OAUTH_CLIENT_RSNRA_LINK_SECRET: z.string().optional(),

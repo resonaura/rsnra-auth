@@ -10,18 +10,17 @@
  * Run: `pnpm setup`
  */
 
-import { join, dirname } from 'node:path';
 import { existsSync } from 'node:fs';
+import { join } from 'node:path';
 import {
   parseEnvFile,
-  writeEnvFile,
-  promptString,
-  promptSecretOrGenerate,
-  promptPasswordOrGenerate,
-  promptConfirm,
-  printHeader,
   printDone,
-  generateSecret,
+  printHeader,
+  promptConfirm,
+  promptPasswordOrGenerate,
+  promptSecretOrGenerate,
+  promptString,
+  writeEnvFile,
 } from './setup-utils.mjs';
 
 const ROOT = import.meta.dirname;
@@ -192,8 +191,18 @@ async function setupApi() {
   );
 
   const authApiPublicUrl = await promptString(
-    'Auth API public URL (for avatar URLs on other services)',
+    'Auth API public URL (for avatar URLs + WebAuthn)',
     values.get('AUTH_API_PUBLIC_URL') ?? `http://localhost:${port}`
+  );
+
+  const webPort = values.get('PORT')
+    ? await parseEnvFile(join(ROOT, '..', 'web', '.env')).then(
+        v => v.values.get('PORT') ?? '2999'
+      )
+    : '2999';
+  const authWebPublicUrl = await promptString(
+    'Auth Web public URL (for WebAuthn origin)',
+    values.get('AUTH_WEB_PUBLIC_URL') ?? `http://localhost:${webPort}`
   );
 
   // OAuth client secrets — for seeding first-party clients
@@ -272,7 +281,13 @@ async function setupApi() {
       key: 'AUTH_API_PUBLIC_URL',
       value: authApiPublicUrl,
       comment:
-        'Public base URL for avatar URLs (http://localhost:2998 or https://api.auth.rsnra.com)',
+        'Public base URL for avatar URLs + WebAuthn (http://localhost:2998 or https://api.auth.rsnra.com)',
+    },
+    {
+      key: 'AUTH_WEB_PUBLIC_URL',
+      value: authWebPublicUrl,
+      comment:
+        'Public base URL for WebAuthn origin (http://localhost:2999 or https://auth.rsnra.com)',
     },
   ];
 

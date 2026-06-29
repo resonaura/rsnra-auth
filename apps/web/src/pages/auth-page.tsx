@@ -1,5 +1,11 @@
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowLeftIcon, EyeIcon, EyeOffIcon, Loader2Icon } from 'lucide-react';
+import {
+  ArrowLeftIcon,
+  EyeIcon,
+  EyeOffIcon,
+  FingerprintIcon,
+  Loader2Icon,
+} from 'lucide-react';
 import * as React from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
 
@@ -33,7 +39,7 @@ function AuthLogo() {
 }
 
 export function AuthPage() {
-  const { login, register } = useAuth();
+  const { login, register, loginWithPasskey } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const redirect = searchParams.get('redirect') ?? '/';
@@ -47,6 +53,7 @@ export function AuthPage() {
   const [displayName, setDisplayName] = React.useState('');
   const [showPassword, setShowPassword] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [isPasskeyLoading, setIsPasskeyLoading] = React.useState(false);
   const [error, setError] = React.useState('');
   const [clientInfo, setClientInfo] = React.useState<PublicClientInfo | null>(
     null
@@ -246,6 +253,48 @@ export function AuthPage() {
                 )}
               </Button>
             </form>
+
+            {/* Passkey sign-in — only on login tab */}
+            {tab === 'login' && (
+              <>
+                <div className="flex items-center gap-3">
+                  <div className="border-border h-px flex-1 border-t" />
+                  <span className="text-muted-foreground text-[0.72rem]">
+                    or
+                  </span>
+                  <div className="border-border h-px flex-1 border-t" />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  disabled={isPasskeyLoading}
+                  onClick={async () => {
+                    setError('');
+                    setIsPasskeyLoading(true);
+                    try {
+                      await loginWithPasskey();
+                      navigate(redirect);
+                    } catch (err) {
+                      setError(
+                        err instanceof Error
+                          ? err.message
+                          : 'Passkey sign-in failed'
+                      );
+                    } finally {
+                      setIsPasskeyLoading(false);
+                    }
+                  }}
+                >
+                  {isPasskeyLoading ? (
+                    <Loader2Icon className="size-4 animate-spin" />
+                  ) : (
+                    <FingerprintIcon className="size-4" />
+                  )}
+                  Sign in with passkey
+                </Button>
+              </>
+            )}
 
             <p className="text-muted-foreground text-center text-[0.72rem] leading-relaxed">
               By continuing, you agree to our{' '}

@@ -1,11 +1,17 @@
 /* eslint-disable react-hooks/set-state-in-effect */
 import { motion } from 'framer-motion';
-import { Camera, Check, Loader2, Trash2 } from 'lucide-react';
+import {
+  Camera,
+  Check,
+  Fingerprint,
+  Loader2,
+  Plus,
+  Trash2,
+} from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 
 import { PageShell } from '@/components/page-shell';
-import { UserAvatar } from '@/components/user-avatar';
 import { Button } from '@/components/ui/button';
 import {
   Card,
@@ -16,9 +22,24 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { UserAvatar } from '@/components/user-avatar';
 import { ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import {
+  deletePasskey,
+  listPasskeys,
+  registerPasskey,
+  type PasskeyInfo,
+} from '@/lib/passkey-api';
 import { useDocumentTitle } from '@/lib/use-document-title';
+
+function formatDeviceName(name: string | null): string {
+  if (!name) return 'Passkey';
+  if (name === 'multiDevice') return 'This device';
+  if (name === 'singleDevice') return 'Security key';
+  // Capitalise first letter
+  return name.charAt(0).toUpperCase() + name.slice(1);
+}
 
 export function AccountPage() {
   useDocumentTitle('Profile');
@@ -39,6 +60,9 @@ export function AccountPage() {
   const [error, setError] = useState('');
   const [saved, setSaved] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [passkeys, setPasskeys] = useState<PasskeyInfo[]>([]);
+  const [addingPasskey, setAddingPasskey] = useState(false);
+  const [passkeyError, setPasskeyError] = useState('');
 
   useEffect(() => {
     if (!authLoading && !user) {
@@ -49,6 +73,9 @@ export function AccountPage() {
   useEffect(() => {
     if (user) {
       setDisplayName(user.displayName ?? '');
+      listPasskeys()
+        .then(setPasskeys)
+        .catch(() => null);
     }
   }, [user]);
 
@@ -196,6 +223,93 @@ export function AccountPage() {
               </motion.span>
             )}
           </div>
+        </motion.section>
+
+        {/* Passkeys */}
+        <motion.section
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, ease: 'easeOut', delay: 0.15 }}
+          className="mb-4"
+        >
+          <Card className="border-border/50 rounded-2xl border bg-transparent p-5">
+            <CardHeader className="p-0">
+              <CardTitle className="flex items-center gap-2 text-sm font-bold">
+                <Fingerprint size={16} /> Passkeys
+              </CardTitle>
+              <CardDescription className="mt-1">
+                Sign in instantly with Face ID, Touch ID, Optic ID or a security
+                key.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="mt-4 flex flex-col gap-3 p-0">
+              {passkeyError && (
+                <p className="text-destructive text-[0.82rem]">
+                  {passkeyError}
+                </p>
+              )}
+              {passkeys.length > 0 && (
+                <div className="flex flex-col gap-2">
+                  {passkeys.map(pk => (
+                    <div
+                      key={pk.id}
+                      className="border-border flex items-center justify-between rounded-lg border p-3"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-sm font-medium">
+                          {formatDeviceName(pk.deviceName)}
+                        </span>
+                        <span className="text-muted-foreground text-xs">
+                          {new Date(pk.createdAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric',
+                          })}
+                        </span>
+                      </div>
+                      <Button
+                        variant="destructive"
+                        size="icon-sm"
+                        onClick={async () => {
+                          await deletePasskey(pk.id);
+                          setPasskeys(await listPasskeys());
+                        }}
+                      >
+                        <Trash2 size={14} />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <Button
+                variant="outline"
+                disabled={addingPasskey}
+                onClick={async () => {
+                  setPasskeyError('');
+                  setAddingPasskey(true);
+                  try {
+                    await registerPasskey();
+                    setPasskeys(await listPasskeys());
+                  } catch (err) {
+                    setPasskeyError(
+                      err instanceof Error
+                        ? err.message
+                        : 'Failed to add passkey'
+                    );
+                  } finally {
+                    setAddingPasskey(false);
+                  }
+                }}
+              >
+                {addingPasskey ? (
+                  <Loader2 size={16} className="animate-spin" />
+                ) : (
+                  <Plus size={16} />
+                )}
+                Add passkey
+              </Button>
+            </CardContent>
+          </Card>
         </motion.section>
 
         {/* Danger zone */}

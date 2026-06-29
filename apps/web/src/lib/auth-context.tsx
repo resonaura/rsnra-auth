@@ -2,6 +2,7 @@
 import * as React from 'react';
 
 import { apiFetch } from '@/lib/api';
+import { authenticateWithPasskey } from '@/lib/passkey-api';
 
 export interface AuthUser {
   id: string;
@@ -25,6 +26,7 @@ interface AuthContextValue {
     password: string,
     displayName?: string
   ) => Promise<void>;
+  loginWithPasskey: () => Promise<void>;
   logout: () => Promise<void>;
   updateProfile: (input: {
     displayName?: string;
@@ -67,6 +69,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     },
     []
   );
+
+  const loginWithPasskey = React.useCallback(async () => {
+    const result = await authenticateWithPasskey();
+    setUser(result.user);
+  }, []);
 
   const logout = React.useCallback(async () => {
     await apiFetch<void>('/auth/logout', { method: 'POST' }).catch(() => null);
@@ -116,6 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       login,
       register,
+      loginWithPasskey,
       logout,
       updateProfile,
       uploadAvatar,
@@ -126,6 +134,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       isLoading,
       login,
       register,
+      loginWithPasskey,
       logout,
       updateProfile,
       uploadAvatar,

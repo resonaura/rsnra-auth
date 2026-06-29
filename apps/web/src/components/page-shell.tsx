@@ -1,6 +1,7 @@
+import { AnimatePresence, motion } from 'framer-motion';
 import {
   ArrowLeftIcon,
-  ChevronDownIcon,
+  ChevronDown,
   ExternalLinkIcon,
   LogOutIcon,
   MoonIcon,
@@ -8,10 +9,8 @@ import {
   SunIcon,
 } from 'lucide-react';
 import { Link, useNavigate, useSearchParams } from 'react-router';
-import { AnimatePresence, motion } from 'framer-motion';
 
 import { useTheme } from '@/components/theme/provider';
-import { useAuth } from '@/lib/auth-context';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -21,6 +20,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { UserAvatar } from '@/components/user-avatar';
+import { useAuth } from '@/lib/auth-context';
 
 interface PageShellProps {
   title: string;
@@ -41,16 +41,10 @@ export function PageShell({
   const hasRedirect = redirectUrl && redirectUrl !== '/';
 
   return (
-    <div className="bg-background flex min-h-svh flex-col">
+    <div className="flex min-h-svh flex-col bg-transparent">
       {/* Navbar — same style as rsnra.link */}
-      <nav
-        className="border-border sticky top-0 z-50 border-b"
-        style={{
-          backdropFilter: 'blur(20px)',
-          background: 'color-mix(in srgb, var(--background) 75%, transparent)',
-        }}
-      >
-        <div className="mx-auto flex w-full max-w-[1200px] items-center justify-between px-6 py-3.5">
+      <nav className="rsnra-nav border-border sticky top-0 z-50 border-b">
+        <div className="rsnra-nav-inner mx-auto flex w-full max-w-[1200px] items-center justify-between">
           {/* Left: logo + service links */}
           <div className="flex items-center gap-6">
             <Link to="/" className="flex items-center">
@@ -64,7 +58,6 @@ export function PageShell({
             <div className="hidden items-center gap-2 sm:flex">
               <Button
                 variant="ghost"
-                size="sm"
                 render={
                   <a
                     href="https://rsnra.link"
@@ -77,7 +70,6 @@ export function PageShell({
               </Button>
               <Button
                 variant="ghost"
-                size="sm"
                 render={
                   <a
                     href="https://md.rsnra.com"
@@ -96,7 +88,6 @@ export function PageShell({
             {hasRedirect && (
               <Button
                 variant="outline"
-                size="sm"
                 className="flex items-center gap-1.5"
                 onClick={() => {
                   if (redirectUrl!.startsWith('http')) {
@@ -112,7 +103,6 @@ export function PageShell({
             )}
             <Button
               variant="ghost"
-              size="sm"
               className="relative flex items-center justify-center"
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
             >
@@ -141,7 +131,6 @@ export function PageShell({
                   render={
                     <Button
                       variant="outline"
-                      size="sm"
                       className="flex items-center gap-1.5 pr-2 pl-1"
                     />
                   }
@@ -154,7 +143,7 @@ export function PageShell({
                   <span className="max-w-25 overflow-hidden text-ellipsis whitespace-nowrap">
                     {user.displayName ?? user.email.split('@')[0]}
                   </span>
-                  <ChevronDownIcon className="text-muted-foreground size-3" />
+                  <ChevronDown size={12} className="text-muted-foreground" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48">
                   <DropdownMenuItem render={<Link to="/profile" />}>
@@ -181,7 +170,7 @@ export function PageShell({
                 </DropdownMenuContent>
               </DropdownMenu>
             ) : (
-              <Button variant="outline" size="sm" render={<Link to="/auth" />}>
+              <Button variant="outline" render={<Link to="/auth" />}>
                 Sign In
               </Button>
             )}
