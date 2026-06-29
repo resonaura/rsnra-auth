@@ -108,10 +108,22 @@ export class AuthService implements OnApplicationBootstrap {
     return `${base}${url}`;
   }
 
+  // Resolves the cookie domain. An empty `COOKIE_DOMAIN` (e.g. `COOKIE_DOMAIN=`
+  // in .env) must fall back to the default — otherwise browsers reject the
+  // `Set-Cookie` because of an explicitly empty `Domain=` attribute. When the
+  // resolved value is empty, the `Domain` attribute is omitted entirely so the
+  // cookie becomes a host-only cookie for the current host (shared across
+  // ports on localhost in dev, which is what we want).
+  private cookieDomain(): string {
+    const isProduction = config.NODE_ENV === 'production';
+    return (
+      config.COOKIE_DOMAIN?.trim() ||
+      (isProduction ? '.rsnra.com' : 'localhost')
+    );
+  }
+
   attachSessionCookie(reply: FastifyReply, accessToken: string) {
     const isProduction = config.NODE_ENV === 'production';
-    const domain =
-      config.COOKIE_DOMAIN ?? (isProduction ? '.rsnra.com' : 'localhost');
     // In production: SameSite=Lax + Secure (HTTPS) + Domain=.rsnra.com
     // In dev: SameSite=None + Secure (localhost is secure context in
     // Chrome/Firefox) + Domain=localhost (shared across ports)
@@ -122,16 +134,15 @@ export class AuthService implements OnApplicationBootstrap {
       'HttpOnly',
       `SameSite=${sameSite}`,
       'Max-Age=31536000',
-      `Domain=${domain}`,
       'Secure',
     ];
+    const domain = this.cookieDomain();
+    if (domain) attributes.push(`Domain=${domain}`);
     reply.header('Set-Cookie', attributes.join('; '));
   }
 
   clearSessionCookie(reply: FastifyReply) {
     const isProduction = config.NODE_ENV === 'production';
-    const domain =
-      config.COOKIE_DOMAIN ?? (isProduction ? '.rsnra.com' : 'localhost');
     const sameSite = isProduction ? 'Lax' : 'None';
     const attributes = [
       'rsnra_session=',
@@ -139,9 +150,10 @@ export class AuthService implements OnApplicationBootstrap {
       'HttpOnly',
       `SameSite=${sameSite}`,
       'Max-Age=0',
-      `Domain=${domain}`,
       'Secure',
     ];
+    const domain = this.cookieDomain();
+    if (domain) attributes.push(`Domain=${domain}`);
     reply.header('Set-Cookie', attributes.join('; '));
   }
 

@@ -274,7 +274,14 @@ export function AuthPage() {
                     setIsPasskeyLoading(true);
                     try {
                       await loginWithPasskey();
-                      navigate(redirect);
+                      // Use window.location for absolute URLs (cross-origin
+                      // redirects to other services), navigate() for internal
+                      // paths — mirrors the form submit handler above.
+                      if (redirect.startsWith('http')) {
+                        window.location.href = redirect;
+                      } else {
+                        navigate(redirect);
+                      }
                     } catch (err) {
                       setError(
                         err instanceof Error
