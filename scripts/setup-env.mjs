@@ -171,13 +171,11 @@ async function setupApi() {
   );
 
   // Admin password — hashed with bcrypt
-  // Check if the current value is already a bcrypt hash
   const currentAdminPass = values.get('ADMIN_PASSWORD');
-  const isAlreadyHashed = currentAdminPass && currentAdminPass.startsWith('$2');
 
   const { plain: adminPlain, hash: adminHash } = await promptPasswordOrGenerate(
     'Admin password',
-    isAlreadyHashed ? currentAdminPass : undefined
+    currentAdminPass
   );
 
   if (adminPlain) {
