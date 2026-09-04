@@ -7,6 +7,7 @@
 [![Web](https://img.shields.io/badge/Web-React%20%7C%20Vite%20%7C%20Tailwind%20v4-61DAFB.svg?logo=react&logoColor=black)](apps/web)
 [![Auth](https://img.shields.io/badge/Auth-OAuth%202.0%20%7C%20JWT-orange.svg)](apps/api)
 [![Website](https://img.shields.io/badge/Website-auth.rsnra.com-8A2BE2.svg)](https://auth.rsnra.com)
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/resonaura)
 
 Central identity provider for RSNRA services. Manages user accounts, authentication, profile data, and OAuth-based single sign-on (SSO) for rsnra.link and md.rsnra.com.
 
