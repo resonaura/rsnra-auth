@@ -1,4 +1,4 @@
-<img src="icon.svg" width="64" height="64" alt="RSNRA Auth Icon" />
+<img src="https://raw.githubusercontent.com/resonaura/rsnra-auth/main/icon.svg" width="64" height="64" alt="RSNRA Auth Icon" />
 
 # RSNRA Auth
 
@@ -8,6 +8,7 @@
 [![Auth](https://img.shields.io/badge/Auth-OAuth%202.0%20%7C%20JWT-orange.svg)](apps/api)
 [![Website](https://img.shields.io/badge/Website-auth.rsnra.com-8A2BE2.svg)](https://auth.rsnra.com)
 
+[![Sponsor on GitHub](https://img.shields.io/badge/Sponsor%20on%20GitHub-EA4AAA?logo=github-sponsors&logoColor=white)](https://github.com/sponsors/resonaura)
 [![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-FFDD00?logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/resonaura)
 
 Central identity provider for RSNRA services. Manages user accounts, authentication, profile data, and OAuth-based single sign-on (SSO) for rsnra.link and md.rsnra.com.
