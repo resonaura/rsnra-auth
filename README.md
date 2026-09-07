@@ -1,4 +1,4 @@
-<img src="https://raw.githubusercontent.com/resonaura/rsnra-auth/main/icon.svg" width="64" height="64" alt="RSNRA Auth Icon" />
+<img src="https://raw.githubusercontent.com/resonaura/rsnra-auth/main/icon.svg" width="64" alt="RSNRA Auth Icon" />
 
 # RSNRA Auth
 
